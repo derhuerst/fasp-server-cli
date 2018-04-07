@@ -1,6 +1,6 @@
 # fasp-server-cli
 
-**A simple command-line-based server for the Friendly Audio Streaming Protocol.**
+**A simple command-line-based server for the Friendly Audio Streaming Protocol.** Based on [`fasp-server`](https://github.com/derhuerst/fasp-server).
 
 [![npm version](https://img.shields.io/npm/v/fasp-server-cli.svg)](https://www.npmjs.com/package/fasp-server-cli)
 ![ISC-licensed](https://img.shields.io/github/license/derhuerst/fasp-server-cli.svg)
@@ -20,7 +20,11 @@ Or use [`npx`](https://npmjs.com/package/npx).
 ## Usage
 
 ```
-todo
+fasp-server init <name> <port>
+    Generate a unique ID, store name and port in a config file at
+    /Users/j/Library/Application Support/fasp-server-cli/config.json.
+fasp-server
+    Run the server with the name port from the config file.
 ```
 
 
