@@ -1,0 +1,25 @@
+{
+	"name": "fasp-server-cli",
+	"description": "A simple command-line-based server for the Friendly Audio Streaming Protocol.",
+	"version": "0.1.0",
+	"main": "index.js",
+	"files": [
+		"index.js"
+	],
+	"keywords": [
+		"audio",
+		"streaming",
+		"fasp",
+		"friendly audio streaming protocol"
+	],
+	"author": "Jannis R <mail@jannisr.de>",
+	"homepage": "https://github.com/derhuerst/fasp-server-cli",
+	"repository": "derhuerst/fasp-server-cli",
+	"bugs": "https://github.com/derhuerst/fasp-server-cli/issues",
+	"license": "ISC",
+	"engines": {
+		"node": ">=6"
+	},
+	"dependencies": {
+	}
+}
