@@ -24,7 +24,7 @@
 	},
 	"dependencies": {
 		"env-paths": "^1.0.0",
-		"fasp-server": "^0.1.0",
+		"fasp-server": "^0.2.0",
 		"mkdirp": "^0.5.1",
 		"mri": "^1.1.0"
 	}

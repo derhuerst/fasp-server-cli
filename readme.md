@@ -1,6 +1,6 @@
 # fasp-server-cli
 
-**A simple command-line-based server for the Friendly Audio Streaming Protocol.** Based on [`fasp-server`](https://github.com/derhuerst/fasp-server).
+**A simple command-line-based server for the [Friendly Audio Streaming Protocol](https://github.com/derhuerst/friendly-audio-streaming-protocol).** Based on [`fasp-server`](https://github.com/derhuerst/fasp-server).
 
 [![npm version](https://img.shields.io/npm/v/fasp-server-cli.svg)](https://www.npmjs.com/package/fasp-server-cli)
 ![ISC-licensed](https://img.shields.io/github/license/derhuerst/fasp-server-cli.svg)
