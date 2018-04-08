@@ -1,7 +1,7 @@
 {
 	"name": "fasp-server-cli",
 	"description": "A simple command-line-based server for the Friendly Audio Streaming Protocol.",
-	"version": "0.1.1",
+	"version": "0.2.0",
 	"bin": {
 		"fasp-server": "./cli.js"
 	},
