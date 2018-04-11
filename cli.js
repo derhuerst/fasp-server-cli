@@ -8,7 +8,11 @@ const envPaths = require('env-paths')
 const pkg = require('./package.json')
 
 const argv = mri(process.argv.slice(2), {
-	boolean: ['help', 'h', 'version', 'v']
+	boolean: [
+		'help', 'h',
+		'version', 'v',
+		'headless'
+	]
 })
 
 const cfgPath = path.join(envPaths(pkg.name, {suffix: ''}).data, 'config.json')
@@ -21,6 +25,8 @@ Usage:
         ${cfgPath}.
     fasp-server
         Run the server with the name port from the config file.
+Options:
+    --headless      No window, no video. Also disables --artwork. Default: false
 \n`)
 	process.exit(0)
 }
@@ -45,6 +51,7 @@ if (cmd === 'init') {
 
 	const name = argv._[1]
 	if ('string' !== typeof name || !name) showError('Missing name.')
+	// todo: use get-port if no port given
 	const port = parseInt(argv._[2])
 	if (Number.isNaN(port) || port <= 0) showError('Invalid or missing port.')
 
@@ -66,7 +73,10 @@ if (cmd === 'init') {
 	const {id, name, port} = JSON.parse(cfg)
 
 	const createServer = require('fasp-server')
-	createServer({id, name, port}, (err) => {
+	createServer({
+		id, name, port,
+		headless: argv.headless
+	}, (err) => {
 		if (err) showError(err)
 		else console.info(`${name} (${id}) listening on ${port}.`)
 	})
