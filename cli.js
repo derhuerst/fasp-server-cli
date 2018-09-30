@@ -4,6 +4,7 @@
 const mri = require('mri')
 const path = require('path')
 const envPaths = require('env-paths')
+const ffp = require('find-free-port');
 
 const pkg = require('./package.json')
 
@@ -51,8 +52,8 @@ if (cmd === 'init') {
 
 	const name = argv._[1]
 	if ('string' !== typeof name || !name) showError('Missing name.')
-	// todo: use get-port if no port given
-	const port = parseInt(argv._[2])
+	const port = argv._[2] == undefined ? ffp(3000).then((err, freePort) => { console.err(err) }) : parseInt(argv._[2])
+	//const port = parseInt(argv._[2])
 	if (Number.isNaN(port) || port <= 0) showError('Invalid or missing port.')
 
 	const id = randomBytes(8).toString('hex')

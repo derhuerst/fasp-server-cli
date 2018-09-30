@@ -25,6 +25,7 @@
 	"dependencies": {
 		"env-paths": "^1.0.0",
 		"fasp-server": "^1.0.0",
+		"find-free-port": "^2.0.0",
 		"mkdirp": "^0.5.1",
 		"mri": "^1.1.0"
 	}
