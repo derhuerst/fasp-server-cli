@@ -4,6 +4,7 @@
 const mri = require('mri')
 const path = require('path')
 const envPaths = require('env-paths')
+const ffp = require('find-free-port');
 
 const pkg = require('./package.json')
 
@@ -15,7 +16,7 @@ const argv = mri(process.argv.slice(2), {
 	]
 })
 
-const cfgPath = path.join(envPaths(pkg.name, {suffix: ''}).data, 'config.json')
+const cfgPath = path.join(envPaths(pkg.name, { suffix: '' }).data, 'config.json')
 
 if (argv.help || argv.h) {
 	process.stdout.write(`
@@ -47,30 +48,41 @@ const fs = require('fs')
 const cmd = argv._[0]
 if (cmd === 'init') {
 	const mkdirp = require('mkdirp')
-	const {randomBytes} = require('crypto')
+	const { randomBytes } = require('crypto')
 
 	const name = argv._[1]
 	if ('string' !== typeof name || !name) showError('Missing name.')
-	// todo: use get-port if no port given
-	const port = parseInt(argv._[2])
+	
+	var port, auxPort = argv._[2];
+	if (auxPort == undefined) {
+		ffp(3000).then(([freep]) => {
+			console.log('Free port is ' + freep);
+			port = freep;
+		}).catch((err) => {
+			console.error(err);
+		});
+	} else{
+		port = parseInt(argv._[2]);
+	}
+	//const port = parseInt(argv._[2])
 	if (Number.isNaN(port) || port <= 0) showError('Invalid or missing port.')
 
 	const id = randomBytes(8).toString('hex')
 
 	mkdirp.sync(path.dirname(cfgPath))
-	fs.writeFileSync(cfgPath, JSON.stringify({id, name, port}))
+	fs.writeFileSync(cfgPath, JSON.stringify({ id, name, port }))
 	console.info('Done.')
 } else {
 	let cfg
 	try {
-		cfg = fs.readFileSync(cfgPath, {encoding: 'utf8'})
+		cfg = fs.readFileSync(cfgPath, { encoding: 'utf8' })
 	} catch (err) {
 		if (err && err.code === 'ENOENT') {
 			showError('Create a config file with the init command first.')
 		}
 		showError(err)
 	}
-	const {id, name, port} = JSON.parse(cfg)
+	const { id, name, port } = JSON.parse(cfg)
 
 	const createServer = require('fasp-server')
 	createServer({
