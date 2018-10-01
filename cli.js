@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 'use strict'
 
 const mri = require('mri')
@@ -9,17 +10,17 @@ const getPort = require('get-port')
 const pkg = require('./package.json')
 
 const argv = mri(process.argv.slice(2), {
-	boolean: [
-		'help', 'h',
-		'version', 'v',
-		'headless'
-	]
+    boolean: [
+        'help', 'h',
+        'version', 'v',
+        'headless'
+    ]
 })
 
-const cfgPath = path.join(envPaths(pkg.name, {suffix: ''}).data, 'config.json')
+const cfgPath = path.join(envPaths(pkg.name, { suffix: '' }).data, 'config.json')
 
 if (argv.help || argv.h) {
-	process.stdout.write(`
+    process.stdout.write(`
 Usage:
     fasp-server init <name> <port>
         Generate a unique ID, store name and port in a config file at
@@ -29,18 +30,18 @@ Usage:
 Options:
     --headless      No window, no video. Also disables --artwork. Default: false
 \n`)
-	process.exit(0)
+    process.exit(0)
 }
 
 if (argv.version || argv.v) {
-	process.stdout.write(`fasp-server v${pkg.version}\n`)
-	process.exit(0)
+    process.stdout.write(`fasp-server v${pkg.version}\n`)
+    process.exit(0)
 }
 
 const showError = (err) => {
-	if (process.env.NODE_DEBUG === pkg.name) console.error(err)
-	else console.error(err.message || (err + ''))
-	process.exit(1)
+    if (process.env.NODE_DEBUG === pkg.name) console.error(err)
+    else console.error(err.message || (err + ''))
+    process.exit(1)
 }
 
 /**
@@ -48,45 +49,46 @@ const showError = (err) => {
  * @param {number} [preferredPort] - The port that is preferred
  */
 const ensurePort = (preferredPort) => {
-	if (!Number.isNaN(preferredPort) && preferredPort > 0) return Promise.resolve(preferredPort)
-	return getPort()
+    if (!Number.isNaN(preferredPort) && preferredPort > 0) return Promise.resolve(preferredPort)
+    return getPort()
 }
 
 const fs = require('fs')
 
 const cmd = argv._[0]
 if (cmd === 'init') {
-	const mkdirp = require('mkdirp')
-	const {randomBytes} = require('crypto')
+    const mkdirp = require('mkdirp')
+    const { randomBytes } = require('crypto')
 
-	const name = argv._[1]
-	if ('string' !== typeof name || !name) showError('Missing name.')
+    const name = argv._[1]
+    if ('string' !== typeof name || !name) showError('Missing name.')
+    const id = randomBytes(8).toString('hex')
+    mkdirp.sync(path.dirname(cfgPath))
 
-	ensurePort(parseInt(argv._[2])).then(port => {
-		const id = randomBytes(8).toString('hex')
-
-		mkdirp.sync(path.dirname(cfgPath))
-		fs.writeFileSync(cfgPath, JSON.stringify({ id, name, port }))
-		console.info('Done.')
-	});
+    ensurePort(parseInt(argv._[2])).then(port => {
+        fs.writeFileSync(cfgPath, JSON.stringify({ id, name, port }))
+        console.info('Done.')
+    });
 } else {
-	let cfg
-	try {
-		cfg = fs.readFileSync(cfgPath, {encoding: 'utf8'})
-	} catch (err) {
-		if (err && err.code === 'ENOENT') {
-			showError('Create a config file with the init command first.')
-		}
-		showError(err)
-	}
-	const {id, name, port} = JSON.parse(cfg)
+    let cfg
+    try {
+        cfg = fs.readFileSync(cfgPath, { encoding: 'utf8' })
+    } catch (err) {
+        if (err && err.code === 'ENOENT') {
+            showError('Create a config file with the init command first.')
+        }
+        showError(err)
+    }
+    const { id, name, port } = JSON.parse(cfg)
 
-	const createServer = require('fasp-server')
-	createServer({
-		id, name, port,
-		headless: argv.headless
-	}, (err) => {
-		if (err) showError(err)
-		else console.info(`${name} (${id}) listening on ${port}.`)
-	})
+    const createServer = require('fasp-server')
+    createServer({
+        id,
+        name,
+        port,
+        headless: argv.headless
+    }, (err) => {
+        if (err) showError(err)
+        else console.info(`${name} (${id}) listening on ${port}.`)
+    })
 }
