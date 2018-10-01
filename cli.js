@@ -6,6 +6,7 @@ const mri = require('mri')
 const path = require('path')
 const envPaths = require('env-paths')
 const getPort = require('get-port')
+const util = require('util');
 
 const pkg = require('./package.json')
 
@@ -66,7 +67,8 @@ if (cmd === 'init') {
 	mkdirp.sync(path.dirname(cfgPath))
 
 	ensurePort(parseInt(argv._[2])).then(port => {
-		fs.writeFileSync(cfgPath, JSON.stringify({ id, name, port }))
+		return util.promisify(fs.writeFile)(cfgPath, JSON.stringify({ id, name, port }))
+	}).then(() => {
 		console.info('Done.')
 	}).catch(err => {
 		console.error(error)
