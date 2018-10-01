@@ -1,9 +1,12 @@
 #!/usr/bin/env node
+
 'use strict'
 
 const mri = require('mri')
 const path = require('path')
 const envPaths = require('env-paths')
+const getPort = require('get-port')
+const util = require('util');
 
 const pkg = require('./package.json')
 
@@ -15,7 +18,7 @@ const argv = mri(process.argv.slice(2), {
 	]
 })
 
-const cfgPath = path.join(envPaths(pkg.name, {suffix: ''}).data, 'config.json')
+const cfgPath = path.join(envPaths(pkg.name, { suffix: '' }).data, 'config.json')
 
 if (argv.help || argv.h) {
 	process.stdout.write(`
@@ -42,39 +45,52 @@ const showError = (err) => {
 	process.exit(1)
 }
 
+/**
+ * Returns a promise that resolves to a valid port number
+ * @param {number} [preferredPort] - The port that is preferred
+ */
+const ensurePort = (preferredPort) => {
+	if (!Number.isNaN(preferredPort) && preferredPort > 0) return Promise.resolve(preferredPort)
+	return getPort()
+}
+
 const fs = require('fs')
 
 const cmd = argv._[0]
 if (cmd === 'init') {
 	const mkdirp = require('mkdirp')
-	const {randomBytes} = require('crypto')
+	const { randomBytes } = require('crypto')
 
 	const name = argv._[1]
 	if ('string' !== typeof name || !name) showError('Missing name.')
-	// todo: use get-port if no port given
-	const port = parseInt(argv._[2])
-	if (Number.isNaN(port) || port <= 0) showError('Invalid or missing port.')
-
 	const id = randomBytes(8).toString('hex')
-
 	mkdirp.sync(path.dirname(cfgPath))
-	fs.writeFileSync(cfgPath, JSON.stringify({id, name, port}))
-	console.info('Done.')
+
+	ensurePort(parseInt(argv._[2])).then(port => {
+		return util.promisify(fs.writeFile)(cfgPath, JSON.stringify({ id, name, port }))
+	}).then(() => {
+		console.info('Done.')
+	}).catch(err => {
+		console.error(error)
+		process.exit(1)
+	})
 } else {
 	let cfg
 	try {
-		cfg = fs.readFileSync(cfgPath, {encoding: 'utf8'})
+		cfg = fs.readFileSync(cfgPath, { encoding: 'utf8' })
 	} catch (err) {
 		if (err && err.code === 'ENOENT') {
 			showError('Create a config file with the init command first.')
 		}
 		showError(err)
 	}
-	const {id, name, port} = JSON.parse(cfg)
+	const { id, name, port } = JSON.parse(cfg)
 
 	const createServer = require('fasp-server')
 	createServer({
-		id, name, port,
+		id,
+		name,
+		port,
 		headless: argv.headless
 	}, (err) => {
 		if (err) showError(err)
