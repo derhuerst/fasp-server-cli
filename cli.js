@@ -68,7 +68,10 @@ if (cmd === 'init') {
     ensurePort(parseInt(argv._[2])).then(port => {
         fs.writeFileSync(cfgPath, JSON.stringify({ id, name, port }))
         console.info('Done.')
-    });
+    }).catch(err => {
+        console.error(error)
+        process.exit(1)
+    })
 } else {
     let cfg
     try {
