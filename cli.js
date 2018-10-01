@@ -4,6 +4,7 @@
 const mri = require('mri')
 const path = require('path')
 const envPaths = require('env-paths')
+const getPort = require('get-port')
 
 const pkg = require('./package.json')
 
@@ -42,6 +43,15 @@ const showError = (err) => {
 	process.exit(1)
 }
 
+/**
+ * Returns a promise that resolves to a valid port number
+ * @param {number} [preferredPort] - The port that is preferred
+ */
+const ensurePort = (preferredPort) => {
+	if (!Number.isNaN(preferredPort) && preferredPort > 0) return Promise.resolve(preferredPort)
+	return getPort()
+}
+
 const fs = require('fs')
 
 const cmd = argv._[0]
@@ -51,15 +61,14 @@ if (cmd === 'init') {
 
 	const name = argv._[1]
 	if ('string' !== typeof name || !name) showError('Missing name.')
-	// todo: use get-port if no port given
-	const port = parseInt(argv._[2])
-	if (Number.isNaN(port) || port <= 0) showError('Invalid or missing port.')
 
-	const id = randomBytes(8).toString('hex')
+	ensurePort(parseInt(argv._[2])).then(port => {
+		const id = randomBytes(8).toString('hex')
 
-	mkdirp.sync(path.dirname(cfgPath))
-	fs.writeFileSync(cfgPath, JSON.stringify({id, name, port}))
-	console.info('Done.')
+		mkdirp.sync(path.dirname(cfgPath))
+		fs.writeFileSync(cfgPath, JSON.stringify({ id, name, port }))
+		console.info('Done.')
+	});
 } else {
 	let cfg
 	try {
