@@ -12,7 +12,17 @@
 
 ```shell
 npm install -g fasp-server-cli
+
+then
+
+git clone https://github.com/derhuerst/fasp-server-cli.git
+cd fasp--server-cli
+npm install
+
+
 ```
+
+
 
 Or use [`npx`](https://npmjs.com/package/npx).
 
