@@ -10,6 +10,8 @@
 
 ## Installing
 
+First, follow [the installation instructions of `fasp-server`](https://github.com/derhuerst/fasp-server/blob/master/readme.md#installing).
+
 ```shell
 npm install -g fasp-server-cli
 ```
